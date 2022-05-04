@@ -13,7 +13,7 @@ p, a, h3{
 	text-decoration: none;
 }
 
-h2, h4{
+body h2, body h4{
 	font-family: 'Source Sans Pro', sans-serif;
 }
 
@@ -60,6 +60,7 @@ li{
 	align-items: stretch;
 	justify-content: space-between;
 	padding-bottom: 45px;
+	box-sizing: content-box;
 }
 
 .header .name-and-search h1{
@@ -114,8 +115,6 @@ li{
 	margin-top: 35px;
 	height: 50px;
 	align-items: center;
-	padding: auto;
-
 }
 
 .menu{
@@ -480,7 +479,7 @@ li{
 	top: 0;
 	left: 0;
 	overflow: auto;
-	z-index: 2 
+	z-index: 2
 
 }
 .all-info div{
