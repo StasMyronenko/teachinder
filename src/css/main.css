@@ -584,6 +584,10 @@ li{
 	margin-bottom:  44px;
 }
 
+.statistics .title{
+	margin-bottom: 45px;
+}
+
 table{
 	width: 100%;
 	border-collapse: collapse;
@@ -684,6 +688,7 @@ tr:nth-child(odd){
 .footer p{
 	font-family: 'PT Sans', sans-serif;
 	margin-bottom: 25px;
+	text-align: left;
 }
 
 /*media*/
