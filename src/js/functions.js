@@ -11,7 +11,7 @@ function find_element_add_info(el, additionalUsers){
 
 function get_correct_data(randomUserMock, additionalUsers){
   let res = [];
-  for (let i in randomUserMock){
+  for(let i in randomUserMock){
     let el = {};
     el['id'] = randomUserMock[i]['id']['name'] + randomUserMock[i]['id']['value']
     el['gender'] = randomUserMock[i]['gender']
@@ -82,7 +82,7 @@ function validation_phone(str){
 }
 
 function data_validation(data){
-  let countries_phone = {"Germany": '49',
+  let countrys_phone = {"Germany": '49',
                     "Ireland": '353',
                     "Australia": '61',
                     "United States": '1',
@@ -159,7 +159,7 @@ function data_validation(data){
     }
     // 3
     el['phone'] = validation_phone(el['phone'])
-    let code = countries_phone[el['country']]
+    let code = countrys_phone[el['country']]
     if (el['phone'].slice(0, code.length) !== code){
       el['phone'] = null
     }
@@ -192,6 +192,7 @@ function filter(data, params){
 }
 
 
+// TODO 4
 
 
 function data_sort(data, params=[], ascending=false){  // ascending - зростаюча
