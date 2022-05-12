@@ -1,7 +1,7 @@
-courses = ['Mathematics', 'Physics', 'English', 'Computer Science', 'Dancing', 'Chess', 'Biology', 'Chemistry', 'Law', 'Art', 'Medicine', 'Statistics']
+let courses = ['Mathematics', 'Physics', 'English', 'Computer Science', 'Dancing', 'Chess', 'Biology', 'Chemistry', 'Law', 'Art', 'Medicine', 'Statistics']
 
 function find_element_add_info(el, additionalUsers){
-  for(add_el of additionalUsers){
+  for(let add_el of additionalUsers){
     if(el['full_name'] === add_el['full_name'] || el['id'] === add_el['id']){
       return add_el
     }
@@ -10,8 +10,8 @@ function find_element_add_info(el, additionalUsers){
 }
 
 function get_correct_data(randomUserMock, additionalUsers){
-  res = [];
-  for(i in randomUserMock){
+  let res = [];
+  for (let i in randomUserMock){
     let el = {};
     el['id'] = randomUserMock[i]['id']['name'] + randomUserMock[i]['id']['value']
     el['gender'] = randomUserMock[i]['gender']
@@ -35,12 +35,12 @@ function get_correct_data(randomUserMock, additionalUsers){
     el['picture_large'] = randomUserMock[i]['picture']['large']
     el['picture_thumbnail'] = randomUserMock[i]['picture']['thumbnail']
 
-    add_el = find_element_add_info(el, additionalUsers)
+    let add_el = find_element_add_info(el, additionalUsers)
     if (add_el !== undefined){
 
-      empty_fields = []
-      for(field in el){
-        if(el[field] == null || el[field] == 'null' || el[field] == undefined){
+      let empty_fields = []
+      for(let field in el){
+        if(el[field] == null || el[field] === 'null' || el[field] === undefined){
           empty_fields.push(field)
         }
       }
@@ -72,8 +72,8 @@ function get_correct_data(randomUserMock, additionalUsers){
 // 2
 
 function validation_phone(str){
-  res = ''
-  for(s of str){
+  let res = ''
+  for(let s of str){
     if(s <= '9' && s >= '0'){
       res += s;
     }
@@ -82,7 +82,7 @@ function validation_phone(str){
 }
 
 function data_validation(data){
-  countrys_phone = {"Germany": '49',
+  let countries_phone = {"Germany": '49',
                     "Ireland": '353',
                     "Australia": '61',
                     "United States": '1',
@@ -159,8 +159,8 @@ function data_validation(data){
     }
     // 3
     el['phone'] = validation_phone(el['phone'])
-    code = countrys_phone[el['country']]
-    if (el['phone'].slice(0, code.length) != code){
+    let code = countries_phone[el['country']]
+    if (el['phone'].slice(0, code.length) !== code){
       el['phone'] = null
     }
 
@@ -175,16 +175,16 @@ function data_validation(data){
 function filter(data, params){
   let res = []
 
-  for(client of data){
+  for(let client of data){
     let flag = true;
-    for(p in params){
+    for(let p in params){
       //console.log(params[p], client[p])
       if (params[p] !== undefined && client[p] !== params[p]){
         flag = false;
         break;
       }
     }
-    if (flag == true){
+    if (flag === true){
       res.push(client)
     }
   }
@@ -217,7 +217,7 @@ function data_sort(data, params=[], ascending=false){  // ascending - зрост
       }
     })
   }
-  if (ascending == true){
+  if (ascending === true){
     return res.reverse()
   }
   else{
@@ -226,13 +226,12 @@ function data_sort(data, params=[], ascending=false){  // ascending - зрост
 }
 
 function search_object(data, param){
-  for(i in param){
+  for(let i in param){
     for(let el of data){
-      if(el[i] == param[i]){
+      if(el[i] === param[i]){
         return el
       }
     }
   }
   return undefined
 }
-
