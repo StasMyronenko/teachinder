@@ -36,7 +36,7 @@ function get_correct_data(randomUserMock, additionalUsers){
     el['picture_thumbnail'] = randomUserMock[i]['picture']['thumbnail']
 
     add_el = find_element_add_info(el, additionalUsers)
-    if (add_el != undefined){
+    if (add_el !== undefined){
 
       empty_fields = []
       for(field in el){
@@ -192,7 +192,6 @@ function filter(data, params){
 }
 
 
-// TODO 4
 
 
 function data_sort(data, params=[], ascending=false){  // ascending - зростаюча
