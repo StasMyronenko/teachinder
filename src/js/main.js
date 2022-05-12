@@ -1,4 +1,4 @@
-let data = get_corect_data(randomUserMock, additionalUsers)
+let data = get_correct_data(randomUserMock, additionalUsers)
 // 2
 data_validation(data)
 

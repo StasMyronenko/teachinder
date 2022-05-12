@@ -2,35 +2,35 @@ courses = ['Mathematics', 'Physics', 'English', 'Computer Science', 'Dancing', '
 
 function find_element_add_info(el, additionalUsers){
   for(add_el of additionalUsers){
-    if(el['full_name'] == add_el['full_name'] || el['id'] == add_el['id']){
+    if(el['full_name'] === add_el['full_name'] || el['id'] === add_el['id']){
       return add_el
     }
   }
   return undefined
 }
 
-function get_corect_data(randomUserMock, additionalUsers){
+function get_correct_data(randomUserMock, additionalUsers){
   res = [];
   for(i in randomUserMock){
     let el = {};
     el['id'] = randomUserMock[i]['id']['name'] + randomUserMock[i]['id']['value']
     el['gender'] = randomUserMock[i]['gender']
-    
+
     el['title'] = randomUserMock[i]['name']['title']
-    el['full_name'] = randomUserMock[i]['name']['first'] + ' ' + randomUserMock[i]['name']['last'] 
-    
+    el['full_name'] = randomUserMock[i]['name']['first'] + ' ' + randomUserMock[i]['name']['last']
+
     el['city'] = randomUserMock[i]['location']['city']
     el['state'] = randomUserMock[i]['location']['state']
     el['country'] = randomUserMock[i]['location']['country']
     el['postcode'] = randomUserMock[i]['location']['postcode']
     el['coordinates'] = randomUserMock[i]['location']['coordinates']
     el['timezone'] = randomUserMock[i]['location']['timezone']
-    
+
     el['email'] = randomUserMock[i]['email']
 
     el['b_date'] = randomUserMock[i]['dob']['date'];
     el['age'] = randomUserMock[i]['dob']['age'];
-    
+
     el['phone'] = randomUserMock[i]['phone']
     el['picture_large'] = randomUserMock[i]['picture']['large']
     el['picture_thumbnail'] = randomUserMock[i]['picture']['thumbnail']
@@ -44,7 +44,7 @@ function get_corect_data(randomUserMock, additionalUsers){
           empty_fields.push(field)
         }
       }
-      
+
       for(f of empty_fields){
         el[f] = add_el[f]
       }
@@ -57,7 +57,7 @@ function get_corect_data(randomUserMock, additionalUsers){
       else{
         el['course'] = courses[Math.floor(Math.random() * 12)]
       }
-      
+
     }
     else{
       el['favorite'] = null
@@ -97,8 +97,8 @@ function data_validation(data){
                     "Canada": '1',
                     "France": '33',
                     "Netherlands": '31'}
-  
-  // 1               
+
+  // 1
   for(let el of data){
     if(typeof el['full_name'] == 'string'){
       if(el['full_name'].charAt(0).toUpperCase() !== el['full_name'].charAt(0)){
