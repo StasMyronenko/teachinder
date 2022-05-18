@@ -1,24 +1,32 @@
-let data = get_correct_data(randomUserMock, additionalUsers)
+// eslint-disable-next-line import/extensions
+import { randomUserMock, additionalUsers } from './db.js';
+import {
+  getCorrectData, dataValidation, filter, dataSort, searchObject,
+// eslint-disable-next-line import/extensions
+} from './functions.js';
+
+const dirtyData = getCorrectData(randomUserMock, additionalUsers);
+console.log(dirtyData);
 // 2
-data_validation(data)
-
-//console.log(data)
-
+const data = dataValidation(dirtyData);
+console.log(data);
 // 3
-let my_client = filter(data, {'gender':'Female'})
-//let my_client = data.filter(element => element.gender == 'Female')
-//console.log(my_client)
+const myClients = filter(data, { gender: 'Female' });
+// let my_client = data.filter(element => element.gender == 'Female')
+console.log(myClients);
 
 // 4
+const sData = dataSort(data, 'full_name');
+// let s_data = data.sort((a, b) => a['age'] > b['age'] ? -1 : 1)
+// let s_data = data.sort((a, b) => a['full_name'] > b['full_name'] ? -1 : 1)
+console.log(sData);
 
-let s_data = data_sort(data, ['full_name'])
-//let s_data = data.sort((a, b) => a['age'] > b['age'] ? -1 : 1)
-//let s_data = data.sort((a, b) => a['full_name'] > b['full_name'] ? -1 : 1)
-console.log(s_data)
+const el = searchObject(data, { age: 65 });
+// let el = data.find(el => el['age'] > 65)
+console.log(el);
 
-let el = search_object(data, {'age': 65})
-//let el = data.find(el => el['age'] > 65)
-//console.log(el)
+const find6 = (data.reduce(
+  (total, current) => total + (current.age > 65 ? 1 : 0), 0,
+) / data.length) * 100;
 
-let find_6 = data.reduce((total, current) => total + (current['age'] > 65 ? 1 : 0), 0) / data.length * 100
-//console.log(find_6)
+console.log(find6);

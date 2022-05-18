@@ -1,4 +1,4 @@
-const randomUserMock = [
+export const randomUserMock = [
   {
     gender: 'male',
     name: { title: 'Mr', first: 'Norbert', last: 'Weishaupt' },
@@ -1853,7 +1853,7 @@ const randomUserMock = [
   },
 ];
 
-const additionalUsers = [
+export const additionalUsers = [
   {
     gender: 'male',
     title: 'Mr',
