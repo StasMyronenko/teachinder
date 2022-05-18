@@ -352,62 +352,6 @@ li {
   grid-row-gap: 40px;
 }
 
-#all-info-1 {
-  display: none;
-}
-
-#all-info-1:checked ~ .all-info-1 .all-info {
-  display: flex;
-}
-
-#all-info-2 {
-  display: none;
-}
-
-#all-info-2:checked ~ .all-info-2 .all-info {
-  display: flex;
-}
-
-#all-info-3 {
-  display: none;
-}
-
-#all-info-3:checked ~ .all-info-3 .all-info {
-  display: flex;
-}
-
-#all-info-4 {
-  display: none;
-}
-
-#all-info-4:checked ~ .all-info-4 .all-info {
-  display: flex;
-}
-
-#all-info-5 {
-  display: none;
-}
-
-#all-info-5:checked ~ .all-info-5 .all-info {
-  display: flex;
-}
-
-#all-info-6 {
-  display: none;
-}
-
-#all-info-6:checked ~ .all-info-6 .all-info {
-  display: flex;
-}
-
-#all-info-7 {
-  display: none;
-}
-
-#all-info-7:checked ~ .all-info-7 .all-info {
-  display: flex;
-}
-
 .teacher {
   margin: auto;
   display: flex;
@@ -467,7 +411,7 @@ li {
   align-items: center;
   width: 100%;
   min-height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.1);
   top: 0;
   left: 0;
   overflow: auto;
