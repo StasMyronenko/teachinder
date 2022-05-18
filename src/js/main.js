@@ -21,4 +21,4 @@ let el = search_object(data, {'age': 65})
 //console.log(el)
 
 let find_6 = data.reduce((total, current) => total + (current['age'] > 65 ? 1 : 0), 0) / data.length * 100
-//console.log(find_6)
+// console.log(find_6)
