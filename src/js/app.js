@@ -1,17 +1,24 @@
 // eslint-disable-next-line import/extensions
 import { randomUserMock, additionalUsers } from './db.js';
-import {
-  getCorrectData, dataValidation, updateTopTeachers,
+
 // eslint-disable-next-line import/extensions
-} from './functions.js';
+const Teacher = require('./functions.js');
 
-// const testModules = require('./test-module');
-// require('../css/app.css');
-// console.log(testModules.hello);
+const teacher = new Teacher(randomUserMock, additionalUsers);
 
-const dirtyData = getCorrectData(randomUserMock, additionalUsers);
+teacher.getCorrectData();
 
-// 2
-const data = dataValidation(dirtyData);
+teacher.dataValidation();
 
-updateTopTeachers(data);
+/* Created filter for country */
+teacher.configureFilters();
+
+teacher.configureSearchField();
+
+teacher.configureAddTeacherForm();
+
+teacher.updateTopTeachers(teacher.data);
+
+teacher.updateFavorite();
+
+teacher.updateStatistics();
