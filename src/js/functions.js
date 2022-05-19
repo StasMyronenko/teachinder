@@ -13,6 +13,8 @@ const courses = [
   'Statistics',
 ];
 
+const favorite = [];
+
 function findElementAddInfo(el, additionalUsers) {
   const res = additionalUsers.filter(
     (addEl) => el.full_name === addEl.full_name || el.id === addEl.id,
@@ -167,33 +169,97 @@ export function filter(data, params) {
   return res;
 }
 
-export function dataSort(data, param = 'full_name', ascending = false) {
-  // ascending - зростаюча
-  const res = [...data];
-
-  if (typeof res[0][param] === 'number') {
-    res.sort((a, b) => a[param] - b[param]);
-  } else {
-    res.sort((a, b) => {
-      if (a[param] <= b[param]) {
-        return -1;
-      }
-      return 1;
-    });
-  }
-  if (ascending === true) {
-    return res.reverse();
-  }
-  return res;
+function showAllInfo(idCard) {
+  const userCard = document.getElementById(idCard);
+  const allInfo = userCard.getElementsByClassName('all-info')[0];
+  allInfo.style.display = 'flex';
 }
 
-export function searchObject(data, param) {
-  const parameters = Object.keys(param);
-  return parameters.reduce((p, c) => data.reduce((pEl, cEl) => {
-    if (cEl[c] === param[c]) {
-      return cEl;
-    }
-    return pEl;
-  }, undefined),
-  undefined);
+function hideAllInfo(idCard) {
+  const userCard = document.getElementById(idCard);
+  const allInfo = userCard.getElementsByClassName('all-info')[0];
+  allInfo.style.display = 'none';
+}
+/* TODO somethong with star */
+function changeFavorites(arrayTo, element, star) {
+  console.log(star.innerText)
+  if (star.innerHTML === '&starf;') {
+    star.innerHTML = '&star;';
+  } else {
+    arrayTo.push(element);
+    star.innerHTML = '&starf;';
+  }
+}
+
+function createUserCard(user, ind, fvr, block = 'tt') {
+  const htmlCard = document.createElement('div');
+  htmlCard.classList.add('teacher');
+  htmlCard.setAttribute('id', `all-info-${block}-${ind}`);
+  htmlCard.innerHTML = `<div class="main-info">
+              <figure class="image-bg">
+                <img src="${user.picture_large}" alt="Teacher">
+              </figure>
+              <h3 class="teacher-name">${user.full_name.split(' ')[0]}</h3>
+              <h3 class="teacher-second-name">${user.full_name.split(' ')[1]}</h3>
+              <p class="science">${user.course}</p>
+              <p class="p-region">${user.country}</p>
+            </div>
+            <div class="all-info">
+              <div>
+                <div class="card">
+                  <header>
+                    <p class="teacher-info">Teacher Info</p>
+                    <p class="cross">&#10006;</p>
+                  </header>
+                  <section>
+                    <figure>
+                      <img src="${user.picture_large}" alt="">
+                    </figure>
+                    <div class="data">
+                      <div class="star">&star;</div>
+
+                      <h3>${user.full_name}</h3>
+
+                      <p class="science">${user.course}</p>
+                      <p class="address">${user.city}, ${user.country}</p>
+                      <p class="year-sex">${user.age}, ${user.gender}</p>
+                      <a href="#" class="email">${user.email}</a>
+                      <p class="number">${user.phone}</p>
+                    </div>
+                  </section>
+                  <p class="description">
+                    ${user.node}
+                  </p>
+                  <details>
+                    <summary>Toggle map</summary>
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d9595.97122911726!2d30.474290256320444!3d50.4291003599208!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40d4cec3731f1293%3A0x87ef4461299b4604!2z0KHQvtC70L7QvCfRj9C90YHRjNC60LjQuSDQu9Cw0L3QtNGI0LDRhNGC0L3QuNC5INC_0LDRgNC6!5e0!3m2!1sru!2sua!4v1650663638378!5m2!1sru!2sua"
+                      width="600"
+                      height="200"
+                      style="border: 0"
+                      allowfullscreen=""
+                      loading="lazy"
+                      referrerpolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                  </details>
+                </div>
+              </div>
+            </div>`;
+  const mainInfo = htmlCard.getElementsByClassName('main-info')[0];
+  mainInfo.addEventListener('click', () => showAllInfo(`all-info-${block}-${ind}`));
+
+  const cross = htmlCard.getElementsByClassName('cross')[0];
+  cross.addEventListener('click', () => hideAllInfo(`all-info-${block}-${ind}`));
+
+  const star = htmlCard.getElementsByClassName('star')[0];
+  star.addEventListener('click', () => { changeFavorites(fvr, user, star); });
+  return htmlCard;
+}
+
+export function updateTopTeachers(data) {
+  const grid = document.getElementsByClassName('top-teachers')[0].getElementsByTagName('main')[0];
+  data.forEach((user, ind) => {
+    const userCard = createUserCard(user, ind, favorite);
+    grid.appendChild(userCard);
+  });
 }

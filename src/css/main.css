@@ -676,9 +676,4 @@ tr:nth-child(odd) {
     text-align: center;
     grid-template-columns: 1fr 250px 250px 250px 1fr;
   }
-
-  .favorite main .all-info-4,
-  .favorite main .all-info-5 {
-    display: none;
-  }
 }
