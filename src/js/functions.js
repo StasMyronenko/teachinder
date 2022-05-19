@@ -13,8 +13,6 @@ const courses = [
   'Statistics',
 ];
 
-const favorite = [];
-
 function findElementAddInfo(el, additionalUsers) {
   const res = additionalUsers.filter(
     (addEl) => el.full_name === addEl.full_name || el.id === addEl.id,
@@ -71,7 +69,7 @@ export function getCorrectData(randomUserMock, additionalUsers) {
           el.course = courses[Math.floor(Math.random() * 12)];
         }
       } else {
-        el.favorite = null;
+        el.favorite = false;
         el.bg_color = null;
         el.note = null;
         el.course = courses[Math.floor(Math.random() * 12)];
@@ -180,18 +178,33 @@ function hideAllInfo(idCard) {
   const allInfo = userCard.getElementsByClassName('all-info')[0];
   allInfo.style.display = 'none';
 }
-/* TODO somethong with star */
-function changeFavorites(arrayTo, element, star) {
-  console.log(star.innerText)
-  if (star.innerHTML === '&starf;') {
-    star.innerHTML = '&star;';
-  } else {
-    arrayTo.push(element);
-    star.innerHTML = '&starf;';
-  }
+
+function updateFavorite() {
+  const favorite = document.getElementsByClassName('favorite')[0];
+  const grid = favorite.getElementsByTagName('main')[0];
+
+  const leftArrow = document.createElement('div');
+  leftArrow.classList.add('left-arrow');
+  leftArrow.innerHTML = '<p>&#10092;</p>';
+
+  const rightArrow = document.createElement('div');
+  rightArrow.classList.add('right-arrow');
+  rightArrow.innerHTML = '<p>&#10093;</p>';
+
+  grid.appendChild(leftArrow);
 }
 
-function createUserCard(user, ind, fvr, block = 'tt') {
+function changeFavorite(element, star) {
+  element.favorite = !element.favorite;
+  if (element.favorite) {
+    star.innerHTML = '&star;';
+  } else {
+    star.innerHTML = '&starf;';
+  }
+  updateFavorite();
+}
+
+function createUserCard(user, ind, block = 'tt') {
   const htmlCard = document.createElement('div');
   htmlCard.classList.add('teacher');
   htmlCard.setAttribute('id', `all-info-${block}-${ind}`);
@@ -252,14 +265,15 @@ function createUserCard(user, ind, fvr, block = 'tt') {
   cross.addEventListener('click', () => hideAllInfo(`all-info-${block}-${ind}`));
 
   const star = htmlCard.getElementsByClassName('star')[0];
-  star.addEventListener('click', () => { changeFavorites(fvr, user, star); });
+  star.addEventListener('click', () => { changeFavorite(user, star); });
   return htmlCard;
 }
 
 export function updateTopTeachers(data) {
+  console.log(data);
   const grid = document.getElementsByClassName('top-teachers')[0].getElementsByTagName('main')[0];
   data.forEach((user, ind) => {
-    const userCard = createUserCard(user, ind, favorite);
+    const userCard = createUserCard(user, ind);
     grid.appendChild(userCard);
   });
 }
