@@ -1,24 +1,27 @@
 // eslint-disable-next-line import/extensions
-import { randomUserMock, additionalUsers } from './db.js';
+const Teachers = require('./teachers.js');
 
-// eslint-disable-next-line import/extensions
-const Teacher = require('./functions.js');
+const start = async () => {
+  const teacher = await new Teachers((await Teachers.getDataFromRandomUserAPI(50)).results);
 
-const teacher = new Teacher(randomUserMock, additionalUsers);
+  teacher.getCorrectData();
 
-teacher.getCorrectData();
+  teacher.dataValidation();
 
-teacher.dataValidation();
+  // Created filter for country
 
-/* Created filter for country */
-teacher.configureFilters();
+  teacher.configureFilters();
 
-teacher.configureSearchField();
+  teacher.configureSearchField();
 
-teacher.configureAddTeacherForm();
+  teacher.configureAddTeacherForm();
 
-teacher.updateTopTeachers(teacher.data);
+  teacher.updateTopTeachers(teacher.data);
 
-teacher.updateFavorite();
+  teacher.updateFavorite();
 
-teacher.updateStatistics();
+  teacher.updateStatistics();
+  teacher.updatePaginator();
+};
+
+start();

@@ -1,5 +1,5 @@
 module.exports = class Teachers {
-  constructor(randomUserMock, additionalUsers) {
+  constructor(mainData, additionalUsers = []) {
     this.courses = [
       'Mathematics',
       'Physics',
@@ -14,9 +14,13 @@ module.exports = class Teachers {
       'Medicine',
       'Statistics',
     ];
+    this.searchFlag = false;
     this.indFirstFavorite = 0;
-    this.randomUserMock = randomUserMock;
     this.additionalUsers = additionalUsers;
+    this.randomUserMock = mainData;
+    this.paginatorPage = 0;
+    this.data = [];
+    this.currentData = [];
   }
 
   findElementAddInfo(el) {
@@ -87,9 +91,9 @@ module.exports = class Teachers {
   }
 
   // 2
-  dataValidation() {
+  dataValidation(saveData = true, saveCurrentData = true) {
     // 1
-    this.data = this.dirtyData.map((element) => {
+    const outputData = this.dirtyData.map((element) => {
       const el = { ...element };
       if (typeof el.full_name === 'string') {
         if (el.full_name.charAt(0).toUpperCase() !== el.full_name.charAt(0)) {
@@ -112,7 +116,7 @@ module.exports = class Teachers {
           el.note = el.note.charAt(0).toUpperCase() + el.note.slice(1);
         }
       } else {
-        el.note = null;
+        el.note = 'Something smart and motivating';
       }
 
       if (typeof el.state === 'string') {
@@ -153,18 +157,15 @@ module.exports = class Teachers {
       }
       return el;
     });
-  }
 
-  static showAllInfo(idCard) {
-    const userCard = document.getElementById(idCard);
-    const allInfo = userCard.getElementsByClassName('all-info')[0];
-    allInfo.style.display = 'flex';
-  }
+    if (saveData) {
+      this.data = [...outputData];
+    }
 
-  static hideAllInfo(idCard) {
-    const userCard = document.getElementById(idCard);
-    const allInfo = userCard.getElementsByClassName('all-info')[0];
-    allInfo.style.display = 'none';
+    if (saveCurrentData) {
+      this.currentData = [...outputData];
+    }
+    return outputData;
   }
 
   changeIndFirstFavorite(count) {
@@ -191,7 +192,7 @@ module.exports = class Teachers {
 
     grid.appendChild(leftArrow);
 
-    const arrFavorite = this.data.filter((el) => el.favorite);
+    const arrFavorite = this.currentData.filter((el) => el.favorite);
     this.countFavorite = arrFavorite.length;
     const maxInd = Math.min(arrFavorite.length, this.indFirstFavorite + 5);
     for (let i = this.indFirstFavorite; i < maxInd; i += 1) {
@@ -279,7 +280,7 @@ module.exports = class Teachers {
     return htmlCard;
   }
 
-  updateTopTeachers(data = this.data) {
+  updateTopTeachers(data = this.currentData) {
     const grid = document.getElementsByClassName('top-teachers')[0].getElementsByTagName('main')[0];
     grid.innerHTML = '';
     data.forEach((user, ind) => {
@@ -292,7 +293,7 @@ module.exports = class Teachers {
     const form = document.getElementsByClassName('filters')[0];
     form.addEventListener('click', () => this.updateFilters());
 
-    const countries = [...new Set(this.data.map((el) => el.country))].sort((a, b) => {
+    const countries = [...new Set(this.currentData.map((el) => el.country))].sort((a, b) => {
       if (a > b) {
         return 1;
       }
@@ -308,7 +309,7 @@ module.exports = class Teachers {
     });
   }
 
-  updateFilters() {
+  updateFilters(paginatorPage = 0) {
     const form = document.getElementsByClassName('filters')[0];
     const ageField = form.age.value;
     const age = ageField.split('-');
@@ -316,36 +317,42 @@ module.exports = class Teachers {
     const gender = form.sex.value;
     const photo = form.photo_only.checked;
     const favorite = form.favorite_only.checked;
-    let res = [...this.data];
+    if (!this.searchFlag) {
+      this.currentData = [...this.data];
+    }
     if (age[0] !== 'All') {
       if (age.length === 2) {
-        res = res.filter((user) => user.age >= parseInt(age[0], 10)
+        this.currentData = this.currentData.filter((user) => user.age >= parseInt(age[0], 10)
             && user.age <= parseInt(age[1], 10));
       } else {
-        res = res.filter((user) => user.age >= 40);
+        this.currentData = this.currentData.filter((user) => user.age >= 40);
       }
     }
 
     if (region !== 'All') {
-      res = res.filter((user) => user.country === region);
+      this.currentData = this.currentData.filter((user) => user.country === region);
     }
 
     if (gender !== 'Both') {
-      res = res.filter((user) => user.gender === gender);
+      this.currentData = this.currentData.filter((user) => user.gender === gender);
     }
 
     if (photo) {
-      res = res.filter((user) => user.picture_large > '');
+      this.currentData = this.currentData.filter((user) => user.picture_large > '');
     }
 
     if (favorite) {
-      res = res.filter((user) => user.favorite);
+      this.currentData = this.currentData.filter((user) => user.favorite);
     }
-    this.updateTopTeachers(res);
+    this.updateTopTeachers();
+    this.paginatorPage = paginatorPage;
+    this.updateStatistics();
+    this.updatePaginator();
   }
 
-  updateStatistics(listData = this.data) {
-    const data = [...listData];
+  updateStatistics(listData = this.currentData) {
+    const indexLastUser = Math.min(this.paginatorPage * 10 + 10, listData.length);
+    const data = [...listData].slice(this.paginatorPage * 10, indexLastUser + 1);
     const table = document.getElementsByClassName('statistics')[0].getElementsByTagName('table')[0];
     table.innerHTML = '';
 
@@ -450,9 +457,14 @@ module.exports = class Teachers {
     });
   }
 
-  search(pattern) {
-    const data = this.findAllForSearch(pattern);
-    this.updateTopTeachers(data);
+  search(pattern, paginatorPage = 0) {
+    this.currentData = this.findAllForSearch(pattern);
+    if (pattern && pattern.length > 0) {
+      this.searchFlag = true;
+    } else {
+      this.searchFlag = false;
+    }
+    this.updateFilters(paginatorPage);
   }
 
   findAllForSearch(pattern) {
@@ -465,7 +477,7 @@ module.exports = class Teachers {
     const form = document.createElement('div');
     form.classList.add('add-teacher-form');
     const optionCourses = this.courses.map((c) => `<option value="${c}">${c}</option>`);
-    const countries = [...new Set(this.data.map((c) => c.country))];
+    const countries = [...new Set(this.currentData.map((c) => c.country))];
     countries.sort((a, b) => (a > b ? 1 : -1));
     const optionCountries = countries.map((c) => `<option value="${c}">${c}</option>`);
     form.innerHTML = `
@@ -607,6 +619,7 @@ module.exports = class Teachers {
     };
     if (!this.alreadyCreated(newUser)) {
       this.data.push(newUser);
+      this.currentData.push(newUser);
     } else {
       alert('This user already created');
     }
@@ -623,5 +636,80 @@ module.exports = class Teachers {
       }
       return p;
     }, undefined);
+  }
+
+  updatePaginator() {
+    console.log(this.paginatorPage);
+    const paginatorDiv = document.getElementsByClassName('statistics-pages')[0];
+    paginatorDiv.innerHTML = '';
+
+    const previous = document.createElement('a');
+    previous.innerText = 'Previous';
+    previous.addEventListener('click', () => this.paginatorDown());
+    paginatorDiv.appendChild(previous);
+
+    for (let i = 0; i < Math.ceil(this.currentData.length / 10); i += 1) {
+      const el = document.createElement('a');
+      el.innerText = i + 1;
+      el.addEventListener('click', () => this.paginatorTo(i));
+
+      if (i === this.paginatorPage) {
+        el.classList.add('page-active');
+      }
+      paginatorDiv.appendChild(el);
+    }
+
+    const next = document.createElement('a');
+    next.innerText = 'Next';
+    next.addEventListener('click', () => this.paginatorUp());
+    paginatorDiv.appendChild(next);
+  }
+
+  paginatorUp() {
+    if (this.paginatorPage + 1 >= Math.ceil(this.currentData.length / 10)) {
+      const getNewData = async () => {
+        this.randomUserMock = (await Teachers.getDataFromRandomUserAPI(10)).results;
+        this.getCorrectData();
+        const res = this.dataValidation(false, false);
+        this.data = [...this.data, ...res];
+        this.search(document.getElementById('search_field').value, this.paginatorPage);
+      };
+      getNewData();
+    } else {
+      this.paginatorPage += 1;
+      this.updatePaginator();
+      this.updateStatistics();
+    }
+  }
+
+  paginatorDown() {
+    if (this.paginatorPage > 0) {
+      this.paginatorPage -= 1;
+      this.updateStatistics();
+      this.updatePaginator();
+    }
+  }
+
+  paginatorTo(ind) {
+    this.paginatorPage = ind;
+    this.updateStatistics();
+    this.updatePaginator();
+  }
+
+  static showAllInfo(idCard) {
+    const userCard = document.getElementById(idCard);
+    const allInfo = userCard.getElementsByClassName('all-info')[0];
+    allInfo.style.display = 'flex';
+  }
+
+  static hideAllInfo(idCard) {
+    const userCard = document.getElementById(idCard);
+    const allInfo = userCard.getElementsByClassName('all-info')[0];
+    allInfo.style.display = 'none';
+  }
+
+  static async getDataFromRandomUserAPI(count = 1) {
+    const response = await fetch(`https://randomuser.me/api/?results=${count}`);
+    return response.json();
   }
 };
