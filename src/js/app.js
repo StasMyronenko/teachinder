@@ -8,6 +8,7 @@ const start = async () => {
 
   teacher.dataValidation();
 
+  console.log(teacher.randomUserMock, teacher.data)
   // Created filter for country
 
   teacher.configureFilters();

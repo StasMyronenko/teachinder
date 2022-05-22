@@ -91,9 +91,9 @@ module.exports = class Teachers {
   }
 
   // 2
-  dataValidation(saveData = true, saveCurrentData = true) {
+  dataValidation(saveData = true, saveCurrentData = true, dataFrom = this.dirtyData) {
     // 1
-    const outputData = this.dirtyData.map((element) => {
+    const outputData = dataFrom.map((element) => {
       const el = { ...element };
       if (typeof el.full_name === 'string') {
         if (el.full_name.charAt(0).toUpperCase() !== el.full_name.charAt(0)) {
@@ -252,7 +252,7 @@ module.exports = class Teachers {
                       </div>
                     </section>
                     <p class="description">
-                      ${user.node}
+                      ${user.note}
                     </p>
                     <details>
                       <summary>Toggle map</summary>
@@ -352,7 +352,12 @@ module.exports = class Teachers {
 
   updateStatistics(listData = this.currentData) {
     const indexLastUser = Math.min(this.paginatorPage * 10 + 10, listData.length);
-    const data = [...listData].slice(this.paginatorPage * 10, indexLastUser + 1);
+    let data;
+    if (listData.length > 10) {
+      data = [...listData].slice(this.paginatorPage * 10, indexLastUser);
+    } else {
+      data = [...listData];
+    }
     const table = document.getElementsByClassName('statistics')[0].getElementsByTagName('table')[0];
     table.innerHTML = '';
 
@@ -459,11 +464,7 @@ module.exports = class Teachers {
 
   search(pattern, paginatorPage = 0) {
     this.currentData = this.findAllForSearch(pattern);
-    if (pattern && pattern.length > 0) {
-      this.searchFlag = true;
-    } else {
-      this.searchFlag = false;
-    }
+    this.searchFlag = pattern && pattern.length > 0;
     this.updateFilters(paginatorPage);
   }
 
@@ -585,7 +586,7 @@ module.exports = class Teachers {
     const bDate = form.bdate.value;
     const gender = form.male.checked ? 'Male' : 'Female';
     const color = form.color.value;
-    const notes = form.notes.value;
+    const note = form.notes.value;
 
     const date = new Date(bDate);
     const now = new Date(Date.now());
@@ -595,7 +596,7 @@ module.exports = class Teachers {
       age -= 1;
     }
 
-    const newUser = {
+    const newUserBeforeValidation = {
       gender,
       title: gender === 'Male' ? 'Mr' : 'Mrs',
       full_name: name,
@@ -615,16 +616,16 @@ module.exports = class Teachers {
       favorite: false,
       picture_large: null,
       picture_thumbnail: null,
-      notes,
+      note,
     };
+    const newUser = this.dataValidation(false, false, [newUserBeforeValidation])[0];
     if (!this.alreadyCreated(newUser)) {
       this.data.push(newUser);
-      this.currentData.push(newUser);
+      Teachers.POST(newUser);
+      this.search(document.getElementById('search_field').value, this.paginatorPage);
     } else {
       alert('This user already created');
     }
-    this.updateTopTeachers();
-    this.updateStatistics();
   }
 
   alreadyCreated(user) {
@@ -639,7 +640,6 @@ module.exports = class Teachers {
   }
 
   updatePaginator() {
-    console.log(this.paginatorPage);
     const paginatorDiv = document.getElementsByClassName('statistics-pages')[0];
     paginatorDiv.innerHTML = '';
 
@@ -694,6 +694,16 @@ module.exports = class Teachers {
     this.paginatorPage = ind;
     this.updateStatistics();
     this.updatePaginator();
+  }
+
+  static async POST(data) {
+    fetch('http://localhost:3000/teachers', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
   }
 
   static showAllInfo(idCard) {
