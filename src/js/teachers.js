@@ -623,8 +623,6 @@ module.exports = class Teachers {
       this.data.push(newUser);
       Teachers.POST(newUser);
       this.search(document.getElementById('search_field').value, this.paginatorPage);
-    } else {
-      alert('This user already created');
     }
   }
 
