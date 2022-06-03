@@ -29,6 +29,10 @@ module.exports = class Teachers {
     return undefined;
   }
 
+  randomCourse() {
+    return this.courses[Math.floor(Math.random() * 12)];
+  }
+
   getCorrectData() {
     const res = [];
     this.randomUserMock.forEach(
@@ -72,13 +76,13 @@ module.exports = class Teachers {
           if (typeof addEl.course === 'string') {
             el.course = addEl.course;
           } else {
-            el.course = this.courses[Math.floor(Math.random() * 12)];
+            el.course = this.randomCourse();
           }
         } else {
           el.favorite = false;
           el.bg_color = null;
           el.note = null;
-          el.course = this.courses[Math.floor(Math.random() * 12)];
+          el.course = this.randomCourse();
         }
         res.push(el);
       },
@@ -157,13 +161,13 @@ module.exports = class Teachers {
 
   static showAllInfo(idCard) {
     const userCard = document.getElementById(idCard);
-    const allInfo = userCard.getElementsByClassName('all-info')[0];
+    const allInfo = userCard.querySelector('.all-info');
     allInfo.style.display = 'flex';
   }
 
   static hideAllInfo(idCard) {
     const userCard = document.getElementById(idCard);
-    const allInfo = userCard.getElementsByClassName('all-info')[0];
+    const allInfo = userCard.querySelector('.all-info');
     allInfo.style.display = 'none';
   }
 
@@ -176,8 +180,8 @@ module.exports = class Teachers {
   }
 
   updateFavorite() {
-    const favorite = document.getElementsByClassName('favorite')[0];
-    const grid = favorite.getElementsByTagName('main')[0];
+    const favorite = document.querySelector('.favorite');
+    const grid = favorite.querySelector('main');
     grid.innerHTML = '';
     const leftArrow = document.createElement('div');
     leftArrow.classList.add('left-arrow');
@@ -205,11 +209,7 @@ module.exports = class Teachers {
     const element = el;
     const star = st;
     element.favorite = !element.favorite;
-    if (element.favorite) {
-      star.innerHTML = '&starf;';
-    } else {
-      star.innerHTML = '&star;';
-    }
+    star.innerHTML = element.favorite ? '&starf;' : '&star;';
     this.updateFavorite();
   }
 
@@ -268,19 +268,19 @@ module.exports = class Teachers {
                   </div>
                 </div>
               </div>`;
-    const mainInfo = htmlCard.getElementsByClassName('main-info')[0];
+    const mainInfo = htmlCard.querySelector('.main-info');
     mainInfo.addEventListener('click', () => Teachers.showAllInfo(`all-info-${block}-${ind}`));
 
-    const cross = htmlCard.getElementsByClassName('cross')[0];
+    const cross = htmlCard.querySelector('.cross');
     cross.addEventListener('click', () => Teachers.hideAllInfo(`all-info-${block}-${ind}`));
 
-    const star = htmlCard.getElementsByClassName('star')[0];
+    const star = htmlCard.querySelector('.star');
     star.addEventListener('click', () => { this.changeFavorite(user, star); });
     return htmlCard;
   }
 
   updateTopTeachers(data = this.data) {
-    const grid = document.getElementsByClassName('top-teachers')[0].getElementsByTagName('main')[0];
+    const grid = document.querySelector('.top-teachers').querySelector('main');
     grid.innerHTML = '';
     data.forEach((user, ind) => {
       const userCard = this.createUserCard(user, ind);
@@ -289,15 +289,12 @@ module.exports = class Teachers {
   }
 
   configureFilters() {
-    const form = document.getElementsByClassName('filters')[0];
+    const form = document.querySelector('.filters');
     form.addEventListener('click', () => this.updateFilters());
 
-    const countries = [...new Set(this.data.map((el) => el.country))].sort((a, b) => {
-      if (a > b) {
-        return 1;
-      }
-      return -1;
-    });
+    const countries = [...new Set(this.data.map((el) => el.country))].sort((a, b) => (
+      a > b ? 1 : -1
+    ));
     const region = document.getElementById('region');
     region.innerHTML = '<option value="All">All</option>';
     countries.forEach((country) => {
@@ -309,7 +306,7 @@ module.exports = class Teachers {
   }
 
   updateFilters() {
-    const form = document.getElementsByClassName('filters')[0];
+    const form = document.querySelector('.filters');
     const ageField = form.age.value;
     const age = ageField.split('-');
     const region = form.region.value;
@@ -346,7 +343,7 @@ module.exports = class Teachers {
 
   updateStatistics(listData = this.data) {
     const data = [...listData];
-    const table = document.getElementsByClassName('statistics')[0].getElementsByTagName('table')[0];
+    const table = document.querySelector('.statistics').querySelector('table');
     table.innerHTML = '';
 
     const head = document.createElement('tr');
@@ -538,7 +535,7 @@ module.exports = class Teachers {
                 </form>
               </div>
             </div>`;
-    const cross = form.getElementsByClassName('cross')[0];
+    const cross = form.querySelector('.cross');
     cross.addEventListener('click', () => {
       form.style.display = 'none';
     });
@@ -548,9 +545,9 @@ module.exports = class Teachers {
 
   configureAddTeacherForm() {
     const buttons = document.getElementsByClassName('add-teacher');
-    const fatherDiv = document.getElementsByClassName('menu-and-add-teacher')[0];
+    const fatherDiv = document.querySelector('.menu-and-add-teacher');
     const divForm = this.createAddTeacherForm();
-    const form = divForm.getElementsByTagName('form')[0];
+    const form = divForm.querySelector('form');
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       this.addTeacher(form);
