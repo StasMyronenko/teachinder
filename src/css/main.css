@@ -401,26 +401,44 @@ li {
   line-height: 16px;
 }
 
-.all-info {
-  position: fixed;
+.addTeachersPaginatorButton {
   display: flex;
+  justify-content: center;
+}
+
+.addTeachersPaginatorButton > div {
+  display: flex;
+  width: 150px;
+  height: 150px;
+  background: rgb(248, 108, 91);
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+}
+
+.addTeachersPaginatorButton > div > p {
+  font-size: 10em;
+  color: white;
+}
+
+.all-info {
+  display: flex;
+  overflow: auto;
+  position: fixed;
   justify-content: center;
   align-items: center;
   width: 100%;
-  min-height: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.1);
   top: 0;
   left: 0;
-  overflow: auto;
   z-index: 2;
 }
 
-.all-info div {
-  width: 950px;
-}
-
 .all-info .card {
+  width: 950px;
   background: white;
+  margin: 800px auto 600px auto;
 }
 
 .all-info .card header {
@@ -454,6 +472,7 @@ li {
 
 .all-info .card section .data {
   margin: 0 0 0 40px;
+  width: 100%;
   text-align: left;
 }
 

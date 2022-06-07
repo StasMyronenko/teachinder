@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/extensions
-const Teachers = require('./teachers.js');
+import Teachers from './teachers';
 
 const start = async () => {
   const teacher = await new Teachers((await Teachers.getDataFromRandomUserAPI(50)).results);

@@ -1,4 +1,7 @@
-module.exports = class Teachers {
+import L from 'leaflet';
+import Chart from 'chart.js';
+
+class Teachers {
   constructor(mainData, additionalUsers = []) {
     this.courses = [
       'Mathematics',
@@ -198,6 +201,7 @@ module.exports = class Teachers {
     for (let i = this.indFirstFavorite; i < maxInd; i += 1) {
       const userCard = this.createUserCard(arrFavorite[i], i, 'f');
       grid.appendChild(userCard);
+      Teachers.createUserMap(arrFavorite[i], i, 'f');
     }
     grid.append(rightArrow);
   }
@@ -256,15 +260,7 @@ module.exports = class Teachers {
                     </p>
                     <details>
                       <summary>Toggle map</summary>
-                      <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d9595.97122911726!2d30.474290256320444!3d50.4291003599208!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40d4cec3731f1293%3A0x87ef4461299b4604!2z0KHQvtC70L7QvCfRj9C90YHRjNC60LjQuSDQu9Cw0L3QtNGI0LDRhNGC0L3QuNC5INC_0LDRgNC6!5e0!3m2!1sru!2sua!4v1650663638378!5m2!1sru!2sua"
-                        width="600"
-                        height="200"
-                        style="border: 0"
-                        allowfullscreen=""
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                      ></iframe>
+                         <div id="map-${block}-${ind}"></div>
                     </details>
                   </div>
                 </div>
@@ -277,6 +273,7 @@ module.exports = class Teachers {
 
     const star = htmlCard.getElementsByClassName('star')[0];
     star.addEventListener('click', () => { this.changeFavorite(user, star); });
+
     return htmlCard;
   }
 
@@ -286,11 +283,29 @@ module.exports = class Teachers {
     data.forEach((user, ind) => {
       const userCard = this.createUserCard(user, ind);
       grid.appendChild(userCard);
+      Teachers.createUserMap(user, ind);
     });
+    const addTeachersPaginatorButton = document.createElement('div');
+    addTeachersPaginatorButton.innerHTML = '<div><p>+</p></div>';
+    addTeachersPaginatorButton.addEventListener('click', () => this.paginatorUp());
+    addTeachersPaginatorButton.classList.add('addTeachersPaginatorButton');
+    grid.appendChild(addTeachersPaginatorButton);
+  }
+
+  static createUserMap(user, ind, block = 'tt') {
+    document.getElementById(`map-${block}-${ind}`).style.height = '600px';
+    document.getElementById(`map-${block}-${ind}`).style.width = '100%';
+    const map = L.map(`map-${block}-${ind}`);
+    map.setView([user.coordinates.latitude, user.coordinates.longitude], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap',
+    }).addTo(map);
+    L.marker([user.coordinates.latitude, user.coordinates.longitude]).addTo(map);
   }
 
   configureFilters() {
-    const form = document.getElementsByClassName('filters')[0];
+    const form = document.querySelector('.filters');
     form.addEventListener('click', () => this.updateFilters());
 
     const countries = [...new Set(this.currentData.map((el) => el.country))].sort((a, b) => {
@@ -638,13 +653,8 @@ module.exports = class Teachers {
   }
 
   updatePaginator() {
-    const paginatorDiv = document.getElementsByClassName('statistics-pages')[0];
+    const paginatorDiv = document.querySelector('.statistics-pages');
     paginatorDiv.innerHTML = '';
-
-    const previous = document.createElement('a');
-    previous.innerText = 'Previous';
-    previous.addEventListener('click', () => this.paginatorDown());
-    paginatorDiv.appendChild(previous);
 
     for (let i = 0; i < Math.ceil(this.currentData.length / 10); i += 1) {
       const el = document.createElement('a');
@@ -656,36 +666,17 @@ module.exports = class Teachers {
       }
       paginatorDiv.appendChild(el);
     }
-
-    const next = document.createElement('a');
-    next.innerText = 'Next';
-    next.addEventListener('click', () => this.paginatorUp());
-    paginatorDiv.appendChild(next);
   }
 
   paginatorUp() {
-    if (this.paginatorPage + 1 >= Math.ceil(this.currentData.length / 10)) {
-      const getNewData = async () => {
-        this.randomUserMock = (await Teachers.getDataFromRandomUserAPI(10)).results;
-        this.getCorrectData();
-        const res = this.dataValidation(false, false);
-        this.data = [...this.data, ...res];
-        this.search(document.getElementById('search_field').value, this.paginatorPage);
-      };
-      getNewData();
-    } else {
-      this.paginatorPage += 1;
-      this.updatePaginator();
-      this.updateStatistics();
-    }
-  }
-
-  paginatorDown() {
-    if (this.paginatorPage > 0) {
-      this.paginatorPage -= 1;
-      this.updateStatistics();
-      this.updatePaginator();
-    }
+    const getNewData = async () => {
+      this.randomUserMock = (await Teachers.getDataFromRandomUserAPI(10)).results;
+      this.getCorrectData();
+      const res = this.dataValidation(false, false);
+      this.data = [...this.data, ...res];
+      this.search(document.getElementById('search_field').value, this.paginatorPage);
+    };
+    getNewData();
   }
 
   paginatorTo(ind) {
@@ -720,4 +711,6 @@ module.exports = class Teachers {
     const response = await fetch(`https://randomuser.me/api/?results=${count}`);
     return response.json();
   }
-};
+}
+
+export default Teachers;
