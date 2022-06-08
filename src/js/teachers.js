@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import Chart from 'chart.js/auto';
+import Chart from 'chart.js';
 
 const _ = require('lodash/core');
 const dayjs = require('dayjs');
@@ -29,6 +29,7 @@ class Teachers {
     this.randomUserMock = mainData;
     this.data = [];
     this.currentData = [];
+    document.getElementById('chartPie').getContext('2d');
     this.myChart = new Chart('chartPie', {});
   }
 
@@ -396,6 +397,7 @@ class Teachers {
       'chartPie',
       config,
     );
+    return listData;
   }
 
   configureSearchField() {
