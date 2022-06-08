@@ -537,40 +537,6 @@ li {
   margin-bottom: 45px;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 44px;
-}
-
-th {
-  font-family: "Source Sans Pro", sans-serif;
-  border-bottom: 1px solid black;
-  padding-top: 18px;
-  padding-bottom: 18px;
-  background: white;
-}
-
-th:hover {
-  background: #fafafa;
-  border-bottom: 5px solid black;
-}
-
-th:hover::after {
-  content: "\2193";
-  padding-left: 5px;
-}
-
-tr {
-  font-family: "PT Sans", sans-serif;
-  height: 36px;
-  text-align: center;
-}
-
-tr:nth-child(odd) {
-  background: rgb(249, 245, 249);
-}
-
 .statistics-pages {
   display: flex;
   margin-top: 37px;

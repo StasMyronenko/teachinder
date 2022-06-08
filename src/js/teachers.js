@@ -1,5 +1,7 @@
 import L from 'leaflet';
-import Chart from 'chart.js';
+import Chart from 'chart.js/auto';
+
+// TODO change statistic chart when we change filters, searcg, or add teachers(paginator)
 
 class Teachers {
   constructor(mainData, additionalUsers = []) {
@@ -21,9 +23,9 @@ class Teachers {
     this.indFirstFavorite = 0;
     this.additionalUsers = additionalUsers;
     this.randomUserMock = mainData;
-    this.paginatorPage = 0;
     this.data = [];
     this.currentData = [];
+    this.myChart = new Chart();
   }
 
   findElementAddInfo(el) {
@@ -324,7 +326,7 @@ class Teachers {
     });
   }
 
-  updateFilters(paginatorPage = 0) {
+  updateFilters() {
     const form = document.getElementsByClassName('filters')[0];
     const ageField = form.age.value;
     const age = ageField.split('-');
@@ -360,112 +362,34 @@ class Teachers {
       this.currentData = this.currentData.filter((user) => user.favorite);
     }
     this.updateTopTeachers();
-    this.paginatorPage = paginatorPage;
     this.updateStatistics();
-    this.updatePaginator();
   }
 
   updateStatistics(listData = this.currentData) {
-    const indexLastUser = Math.min(this.paginatorPage * 10 + 10, listData.length);
-    let data;
-    if (listData.length > 10) {
-      data = [...listData].slice(this.paginatorPage * 10, indexLastUser);
-    } else {
-      data = [...listData];
-    }
-    const table = document.getElementsByClassName('statistics')[0].getElementsByTagName('table')[0];
-    table.innerHTML = '';
-
-    const head = document.createElement('tr');
-    head.classList.add('table-head');
-
-    const name = document.createElement('th');
-    name.innerText = 'Name';
-    name.addEventListener('click', () => {
-      data.sort((a, b) => {
-        if (a.full_name > b.full_name) {
-          return 1;
-        }
-        return -1;
-      });
-      this.updateStatistics(data);
-    });
-
-    const speciality = document.createElement('th');
-    speciality.innerText = 'Speciality';
-    speciality.addEventListener('click', () => {
-      data.sort((a, b) => {
-        if (a.course >= b.course) {
-          return 1;
-        }
-        return -1;
-      });
-      this.updateStatistics(data);
-    });
-
-    const age = document.createElement('th');
-    age.innerText = 'Age';
-    age.addEventListener('click', () => {
-      data.sort((a, b) => b.age - a.age);
-      this.updateStatistics(data);
-    });
-
-    const gender = document.createElement('th');
-    gender.innerText = 'Gender';
-    gender.addEventListener('click', () => {
-      data.sort((a, b) => {
-        if (a.gender <= b.gender) {
-          return 1;
-        }
-        return -1;
-      });
-      this.updateStatistics(data);
-    });
-
-    const nationality = document.createElement('th');
-    nationality.innerText = 'Nationality';
-    nationality.addEventListener('click', () => {
-      data.sort((a, b) => {
-        if (a.country >= b.country) {
-          return 1;
-        }
-        return -1;
-      });
-      this.updateStatistics(data);
-    });
-    head.appendChild(name);
-    head.appendChild(speciality);
-    head.appendChild(age);
-    head.appendChild(gender);
-    head.appendChild(nationality);
-
-    table.appendChild(head);
-
-    data.forEach((user) => {
-      const tr = document.createElement('tr');
-
-      const userName = document.createElement('td');
-      userName.innerText = user.full_name;
-
-      const userSpeciality = document.createElement('td');
-      userSpeciality.innerText = user.course;
-
-      const userAge = document.createElement('td');
-      userAge.innerText = user.age;
-
-      const userGender = document.createElement('td');
-      userGender.innerText = user.gender;
-
-      const userNationality = document.createElement('td');
-      userNationality.innerText = user.country;
-
-      tr.appendChild(userName);
-      tr.appendChild(userSpeciality);
-      tr.appendChild(userAge);
-      tr.appendChild(userGender);
-      tr.appendChild(userNationality);
-      table.appendChild(tr);
-    });
+    const dataSet = this.courses.map((c) => listData.filter(
+      (teacher) => teacher.course === c,
+    ).length);
+    const data = {
+      labels: this.courses,
+      datasets: [
+        {
+          label: 'Statistic',
+          backgroundColor: this.courses.map(() => Teachers.randomColor(100, 100, 100)),
+          borderColor: this.courses.map(() => Teachers.randomColor(100, 100, 100)),
+          data: dataSet,
+        },
+      ],
+    };
+    const config = {
+      type: 'pie',
+      data,
+      options: {},
+    };
+    this.myChart.destroy();
+    this.myChart = new Chart(
+      'chartPie',
+      config,
+    );
   }
 
   configureSearchField() {
@@ -477,10 +401,10 @@ class Teachers {
     });
   }
 
-  search(pattern, paginatorPage = 0) {
+  search(pattern) {
     this.currentData = this.findAllForSearch(pattern);
     this.searchFlag = pattern && pattern.length > 0;
-    this.updateFilters(paginatorPage);
+    this.updateFilters();
   }
 
   findAllForSearch(pattern) {
@@ -637,7 +561,7 @@ class Teachers {
     if (!this.alreadyCreated(newUser)) {
       this.data.push(newUser);
       Teachers.POST(newUser);
-      this.search(document.getElementById('search_field').value, this.paginatorPage);
+      this.search(document.getElementById('search_field').value);
     }
   }
 
@@ -652,37 +576,15 @@ class Teachers {
     }, undefined);
   }
 
-  updatePaginator() {
-    const paginatorDiv = document.querySelector('.statistics-pages');
-    paginatorDiv.innerHTML = '';
-
-    for (let i = 0; i < Math.ceil(this.currentData.length / 10); i += 1) {
-      const el = document.createElement('a');
-      el.innerText = i + 1;
-      el.addEventListener('click', () => this.paginatorTo(i));
-
-      if (i === this.paginatorPage) {
-        el.classList.add('page-active');
-      }
-      paginatorDiv.appendChild(el);
-    }
-  }
-
   paginatorUp() {
     const getNewData = async () => {
       this.randomUserMock = (await Teachers.getDataFromRandomUserAPI(10)).results;
       this.getCorrectData();
       const res = this.dataValidation(false, false);
       this.data = [...this.data, ...res];
-      this.search(document.getElementById('search_field').value, this.paginatorPage);
+      this.search(document.getElementById('search_field').value);
     };
     getNewData();
-  }
-
-  paginatorTo(ind) {
-    this.paginatorPage = ind;
-    this.updateStatistics();
-    this.updatePaginator();
   }
 
   static async POST(data) {
@@ -710,6 +612,10 @@ class Teachers {
   static async getDataFromRandomUserAPI(count = 1) {
     const response = await fetch(`https://randomuser.me/api/?results=${count}`);
     return response.json();
+  }
+
+  static randomColor(r = 256, g = 256, b = 256) {
+    return `rgb(${Math.floor(Math.random() * r) + 256 - r},${Math.floor(Math.random() * g) + 256 - g},${Math.floor(Math.random() * b) + 256 - b})`;
   }
 }
 

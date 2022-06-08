@@ -21,7 +21,6 @@ const start = async () => {
   teacher.updateFavorite();
 
   teacher.updateStatistics();
-  teacher.updatePaginator();
 };
 
 start();
