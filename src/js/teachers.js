@@ -1,7 +1,7 @@
 import L from 'leaflet';
 import Chart from 'chart.js/auto';
 
-// TODO change statistic chart when we change filters, searcg, or add teachers(paginator)
+const _ = require('lodash/core');
 
 class Teachers {
   constructor(mainData, additionalUsers = []) {
@@ -29,9 +29,8 @@ class Teachers {
   }
 
   findElementAddInfo(el) {
-    const res = this.additionalUsers.filter(
-      (addEl) => el.full_name === addEl.full_name || el.id === addEl.id,
-    );
+    const res = _.filter(this.additionalUsers,
+      (addEl) => el.full_name === addEl.full_name || el.id === addEl.id);
     if (res.length > 0) {
       return res[0];
     }
@@ -40,7 +39,7 @@ class Teachers {
 
   getCorrectData() {
     const res = [];
-    this.randomUserMock.forEach(
+    _.forEach(this.randomUserMock,
       (i) => {
         let el = {};
         el.id = i.id.name + i.id.value;
@@ -69,12 +68,12 @@ class Teachers {
         if (addEl) {
           const emptyFields = [];
           const keys = Object.keys(el);
-          keys.forEach((field) => {
+          _.forEach(keys, (field) => {
             if (!el[field] || el[field] === 'null') {
               emptyFields.push(field);
             }
           });
-          el = { ...el, ...emptyFields.map((f) => addEl[f]) };
+          el = { ...el, ..._.map(emptyFields, (f) => addEl[f]) };
           el.favorite = addEl.favorite;
           el.bg_color = addEl.bg_color;
           el.note = addEl.note;
@@ -90,15 +89,14 @@ class Teachers {
           el.course = this.courses[Math.floor(Math.random() * 12)];
         }
         res.push(el);
-      },
-    );
+      });
     this.dirtyData = res;
   }
 
   // 2
   dataValidation(saveData = true, saveCurrentData = true, dataFrom = this.dirtyData) {
     // 1
-    const outputData = dataFrom.map((element) => {
+    const outputData = _.map(dataFrom, (element) => {
       const el = { ...element };
       if (typeof el.full_name === 'string') {
         if (el.full_name.charAt(0).toUpperCase() !== el.full_name.charAt(0)) {
@@ -197,7 +195,7 @@ class Teachers {
 
     grid.appendChild(leftArrow);
 
-    const arrFavorite = this.currentData.filter((el) => el.favorite);
+    const arrFavorite = _.filter(this.currentData, (el) => el.favorite);
     this.countFavorite = arrFavorite.length;
     const maxInd = Math.min(arrFavorite.length, this.indFirstFavorite + 5);
     for (let i = this.indFirstFavorite; i < maxInd; i += 1) {
@@ -282,7 +280,7 @@ class Teachers {
   updateTopTeachers(data = this.currentData) {
     const grid = document.getElementsByClassName('top-teachers')[0].getElementsByTagName('main')[0];
     grid.innerHTML = '';
-    data.forEach((user, ind) => {
+    _.forEach(data, (user, ind) => {
       const userCard = this.createUserCard(user, ind);
       grid.appendChild(userCard);
       Teachers.createUserMap(user, ind);
@@ -310,7 +308,7 @@ class Teachers {
     const form = document.querySelector('.filters');
     form.addEventListener('click', () => this.updateFilters());
 
-    const countries = [...new Set(this.currentData.map((el) => el.country))].sort((a, b) => {
+    const countries = [...new Set(_.map(this.currentData, (el) => el.country))].sort((a, b) => {
       if (a > b) {
         return 1;
       }
@@ -318,7 +316,7 @@ class Teachers {
     });
     const region = document.getElementById('region');
     region.innerHTML = '<option value="All">All</option>';
-    countries.forEach((country) => {
+    _.forEach(countries, (country) => {
       const option = document.createElement('option');
       option.setAttribute('value', country);
       option.innerHTML = country;
@@ -339,43 +337,42 @@ class Teachers {
     }
     if (age[0] !== 'All') {
       if (age.length === 2) {
-        this.currentData = this.currentData.filter((user) => user.age >= parseInt(age[0], 10)
+        this.currentData = _.filter(this.currentData, (user) => user.age >= parseInt(age[0], 10)
             && user.age <= parseInt(age[1], 10));
       } else {
-        this.currentData = this.currentData.filter((user) => user.age >= 40);
+        this.currentData = _.filter(this.currentData, (user) => user.age >= 40);
       }
     }
 
     if (region !== 'All') {
-      this.currentData = this.currentData.filter((user) => user.country === region);
+      this.currentData = _.filter(this.currentData, (user) => user.country === region);
     }
 
     if (gender !== 'Both') {
-      this.currentData = this.currentData.filter((user) => user.gender === gender);
+      this.currentData = _.filter(this.currentData, (user) => user.gender === gender);
     }
 
     if (photo) {
-      this.currentData = this.currentData.filter((user) => user.picture_large > '');
+      this.currentData = _.filter(this.currentData, (user) => user.picture_large > '');
     }
 
     if (favorite) {
-      this.currentData = this.currentData.filter((user) => user.favorite);
+      this.currentData = _.filter(this.currentData, (user) => user.favorite);
     }
     this.updateTopTeachers();
     this.updateStatistics();
   }
 
   updateStatistics(listData = this.currentData) {
-    const dataSet = this.courses.map((c) => listData.filter(
-      (teacher) => teacher.course === c,
-    ).length);
+    const dataSet = _.map(this.courses, (c) => _.filter(listData,
+      (teacher) => teacher.course === c).length);
     const data = {
       labels: this.courses,
       datasets: [
         {
           label: 'Statistic',
-          backgroundColor: this.courses.map(() => Teachers.randomColor(100, 100, 100)),
-          borderColor: this.courses.map(() => Teachers.randomColor(100, 100, 100)),
+          backgroundColor: _.map(this.courses, () => Teachers.randomColor(100, 100, 100)),
+          borderColor: _.map(this.courses, () => Teachers.randomColor(100, 100, 100)),
           data: dataSet,
         },
       ],
@@ -408,7 +405,7 @@ class Teachers {
   }
 
   findAllForSearch(pattern) {
-    return this.data.filter((user) => user.full_name.includes(pattern)
+    return _.filter(this.data, (user) => user.full_name.includes(pattern)
         || (user.note && user.note.includes(pattern))
         || user.age === parseInt(pattern, 10));
   }
@@ -416,10 +413,10 @@ class Teachers {
   createAddTeacherForm() {
     const form = document.createElement('div');
     form.classList.add('add-teacher-form');
-    const optionCourses = this.courses.map((c) => `<option value="${c}">${c}</option>`);
-    const countries = [...new Set(this.currentData.map((c) => c.country))];
+    const optionCourses = _.map(this.courses, (c) => `<option value="${c}">${c}</option>`);
+    const countries = [...new Set(_.map(this.currentData, (c) => c.country))];
     countries.sort((a, b) => (a > b ? 1 : -1));
-    const optionCountries = countries.map((c) => `<option value="${c}">${c}</option>`);
+    const optionCountries = _.map(countries, (c) => `<option value="${c}">${c}</option>`);
     form.innerHTML = `
             <div>
               <div class="card">
@@ -500,9 +497,9 @@ class Teachers {
 
   configureAddTeacherForm() {
     const buttons = document.getElementsByClassName('add-teacher');
-    const fatherDiv = document.getElementsByClassName('menu-and-add-teacher')[0];
+    const fatherDiv = document.querySelector('.menu-and-add-teacher');
     const divForm = this.createAddTeacherForm();
-    const form = divForm.getElementsByTagName('form')[0];
+    const form = divForm.querySelector('form');
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       this.addTeacher(form);
@@ -545,7 +542,7 @@ class Teachers {
       state: null,
       country,
       postcode: null,
-      coordinates: { latitude: null, longitude: null },
+      coordinates: { latitude: 0, longitude: 0 },
       timezone: null,
       email,
       b_date: bDate,
