@@ -25,7 +25,7 @@ class Teachers {
     this.randomUserMock = mainData;
     this.data = [];
     this.currentData = [];
-    this.myChart = new Chart();
+    this.myChart = new Chart('chartPie', {});
   }
 
   findElementAddInfo(el) {
@@ -308,12 +308,7 @@ class Teachers {
     const form = document.querySelector('.filters');
     form.addEventListener('click', () => this.updateFilters());
 
-    const countries = [...new Set(_.map(this.currentData, (el) => el.country))].sort((a, b) => {
-      if (a > b) {
-        return 1;
-      }
-      return -1;
-    });
+    const countries = _.sortBy([...new Set(_.map(this.currentData, (el) => el.country))], (a) => a);
     const region = document.getElementById('region');
     region.innerHTML = '<option value="All">All</option>';
     _.forEach(countries, (country) => {
@@ -414,8 +409,8 @@ class Teachers {
     const form = document.createElement('div');
     form.classList.add('add-teacher-form');
     const optionCourses = _.map(this.courses, (c) => `<option value="${c}">${c}</option>`);
-    const countries = [...new Set(_.map(this.currentData, (c) => c.country))];
-    countries.sort((a, b) => (a > b ? 1 : -1));
+    let countries = [...new Set(_.map(this.currentData, (c) => c.country))];
+    countries = _.sortBy(countries, (a) => a);
     const optionCountries = _.map(countries, (c) => `<option value="${c}">${c}</option>`);
     form.innerHTML = `
             <div>
