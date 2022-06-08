@@ -2,6 +2,10 @@ import L from 'leaflet';
 import Chart from 'chart.js/auto';
 
 const _ = require('lodash/core');
+const dayjs = require('dayjs');
+const relativeTime = require('dayjs/plugin/relativeTime');
+
+dayjs.extend(relativeTime);
 
 class Teachers {
   constructor(mainData, additionalUsers = []) {
@@ -219,6 +223,15 @@ class Teachers {
   }
 
   createUserCard(user, ind, block = 'tt') {
+    const now = dayjs();
+    let bDate = dayjs(user.b_date);
+    bDate = bDate.year(now.year());
+
+    if (bDate < now) {
+      bDate = bDate.year(now.year() + 1);
+    }
+
+    const beforeBDay = bDate.fromNow();
     const htmlCard = document.createElement('div');
     const favoriteStar = user.favorite ? '&starf;' : '&star;';
     htmlCard.classList.add('teacher');
@@ -251,6 +264,7 @@ class Teachers {
                         <p class="science">${user.course}</p>
                         <p class="address">${user.city}, ${user.country}</p>
                         <p class="year-sex">${user.age}, ${user.gender}</p>
+                        <p class="year-sex">Birthday will be ${beforeBDay}</p>
                         <a href="#" class="email">${user.email}</a>
                         <p class="number">${user.phone}</p>
                       </div>
