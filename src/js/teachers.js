@@ -31,6 +31,7 @@ class Teachers {
     this.currentData = [];
     document.getElementById('chartPie').getContext('2d');
     this.myChart = new Chart('chartPie', {});
+    this.leafletmaps = [];
   }
 
   findElementAddInfo(el) {
@@ -237,9 +238,10 @@ class Teachers {
     const favoriteStar = user.favorite ? '&starf;' : '&star;';
     htmlCard.classList.add('teacher');
     htmlCard.setAttribute('id', `all-info-${block}-${ind}`);
+
     htmlCard.innerHTML = `<div class="main-info">
                 <figure class="image-bg">
-                  <img src="${user.picture_large}" alt="Teacher">
+                  ${user.picture_large ? `<img src="${user.picture_large}" alt="Teacher">` : null}
                 </figure>
                 <h3 class="teacher-name">${user.full_name.split(' ')[0]}</h3>
                 <h3 class="teacher-second-name">${user.full_name.split(' ')[1]}</h3>
@@ -255,7 +257,7 @@ class Teachers {
                     </header>
                     <section>
                       <figure>
-                        <img src="${user.picture_large}" alt="">
+                         ${user.picture_large ? `<img src="${user.picture_large}" alt="Teacher">` : null}
                       </figure>
                       <div class="data">
                         <div class="star">${favoriteStar}</div>
@@ -273,7 +275,7 @@ class Teachers {
                     <p class="description">
                       ${user.note}
                     </p>
-                    <details>
+                    <details id="details-${block}-${ind}">
                       <summary>Toggle map</summary>
                          <div id="map-${block}-${ind}"></div>
                     </details>
@@ -298,7 +300,9 @@ class Teachers {
     _.forEach(data, (user, ind) => {
       const userCard = this.createUserCard(user, ind);
       grid.appendChild(userCard);
-      Teachers.createUserMap(user, ind);
+      const map = Teachers.createUserMap(user, ind);
+      const details = document.getElementById(`details-tt-${ind}`);
+      details.addEventListener('click', () => setTimeout(() => map.invalidateSize(), 0));
     });
     const addTeachersPaginatorButton = document.createElement('div');
     addTeachersPaginatorButton.innerHTML = '<div><p>+</p></div>';
@@ -317,6 +321,8 @@ class Teachers {
       attribution: '© OpenStreetMap',
     }).addTo(map);
     L.marker([user.coordinates.latitude, user.coordinates.longitude]).addTo(map);
+
+    return map;
   }
 
   configureFilters() {
